@@ -33,6 +33,10 @@ public class ReclamationService {
         return reclamationRepository.findAll();
     }
 
+public int countReclamationsForProfessor(Long professorId) {
+    return reclamationRepository.countByProfessorId(professorId);
+}
+
     public Optional<Reclamation> getReclamationById(Long id) { // Corrected: Renamed from findReclamationById
         return reclamationRepository.findById(id);
     }

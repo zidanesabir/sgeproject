@@ -27,6 +27,9 @@ public class ExamenService {
     public Optional<Examen> getExamenById(Long id) {
         return examenRepository.findById(id);
     }
+    public int countExamensForProfessor(Long professorId) {
+    return examenRepository.countByProfessorId(professorId);
+}
 
     @Transactional
     public Examen saveExamen(Examen examen) {

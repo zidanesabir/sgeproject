@@ -15,4 +15,7 @@ public interface ReclamationRepository extends JpaRepository<Reclamation, Long> 
     // ----------------------------------------------------------------------------------
 
     // Any other specific query methods for Reclamation would go here.
+    @Query("SELECT COUNT(r) FROM Reclamation r WHERE r.professeur.id = :professorId")
+int countByProfessorId(@Param("professorId") Long professorId);
+
 }

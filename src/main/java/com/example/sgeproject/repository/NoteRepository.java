@@ -32,4 +32,11 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
     // If these methods are causing compilation errors, comment them out until 'estValidee' is added to Note.java.
     // List<Note> findByEstValideeTrue();
     // List<Note> findByEstValideeFalse();
+     @Query("SELECT COUNT(n) FROM Note n WHERE n.examen.professeur.id = :professorId")
+    int countByProfessorId(@Param("professorId") Long professorId);
+
+    List<Note> findByEtudiant(com.example.sgeproject.model.Etudiant etudiant);
+
+    @Query("SELECT n FROM Note n JOIN FETCH n.etudiant JOIN FETCH n.examen")
+    List<Note> findAllWithDetails();
 }

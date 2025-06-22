@@ -85,4 +85,8 @@ public class NoteService {
         // Make sure it uses a JOIN FETCH if Etudiant or Examen are needed for rendering.
         return noteRepository.findByEtudiant(etudiant);
     }
+    public int countByProfessorId(Long professorId) {
+    return noteRepository.countByProfessorId(professorId);
+}
+
 }

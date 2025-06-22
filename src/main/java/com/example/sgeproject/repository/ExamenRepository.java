@@ -13,4 +13,7 @@ public interface ExamenRepository extends JpaRepository<Examen, Long> {
     @Query("SELECT e FROM Examen e JOIN FETCH e.module")
     List<Examen> findAllWithDetails();
     // ----------------------------------------------------------------
+    @Query("SELECT COUNT(e) FROM Examen e WHERE e.professeur.id = :professorId")
+int countByProfessorId(@Param("professorId") Long professorId);
+
 }
