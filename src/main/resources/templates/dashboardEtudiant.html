@@ -6,15 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SGE Project - Student Dashboard</title>
     <link rel="stylesheet" th:href="@{/main.css}">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 <div class="header">
     <div class="logo">SGE Project</div>
     <nav>
         <ul class="nav-links">
-            <li><a th:href="@{/home}">Home</a></li>
+
             <li><a th:href="@{/etudiant/relevesNotes}">My Grades</a></li>
             <li><a th:href="@{/etudiant/reclamations}">Reclamations</a></li>
+            <li><a th:href="@{/etudiant/planningExamens}">Exam Schedule</a></li>
             <li><a th:href="@{/logout}">Logout</a></li>
         </ul>
     </nav>
@@ -24,51 +27,199 @@
     <h1 class="text-center">Student Dashboard</h1>
     <p class="text-center">Welcome, <span sec:authentication="name">Student</span>! Here are your student portal options.</p>
 
-    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-top: 30px;">
+    <div class="dashboard-grid">
         <div class="card">
-            <h3><a th:href="@{/etudiant/relevesNotes}">View My Grades</a></h3>
-            <p>Check your academic results and grade reports.</p>
+            <div class="card-icon">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="card-content">
+                <h3><a th:href="@{/etudiant/relevesNotes}">View My Grades</a></h3>
+                <p>Check your academic results and grade reports.</p>
+            </div>
         </div>
+
         <div class="card">
-            <h3><a th:href="@{/etudiant/reclamations}">Submit Reclamation</a></h3>
-            <p>Submit a request regarding your grades or exam issues.</p>
+            <div class="card-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="card-content">
+                <h3><a th:href="@{/etudiant/reclamations}">Submit Reclamation</a></h3>
+                <p>Submit a request regarding your grades or exam issues.</p>
+            </div>
         </div>
+
         <div class="card">
-            <h3><a th:href="@{/etudiant/planningExamens}">Exam Schedule</a></h3>
-            <p>View your upcoming exam schedule.</p>
+            <div class="card-icon">
+                <i class="fas fa-calendar-alt"></i>
+            </div>
+            <div class="card-content">
+                <h3><a th:href="@{/etudiant/planningExamens}">Exam Schedule</a></h3>
+                <p>View your upcoming exam schedule.</p>
+            </div>
         </div>
     </div>
 </div>
 
 <div class="footer">
-    <p>&copy; 2023 SGE Project. All rights reserved.</p>
+    <p>&copy; 2025 SGE Project. All rights reserved created by Z-A-I-H.</p>
 </div>
 
 <script th:src="@{/script.js}"></script>
 <style>
+    :root {
+        --primary-color: #4f46e5;
+        --primary-hover: #4338ca;
+        --secondary-color: #f8fafc;
+        --text-dark: #1e293b;
+        --text-light: #64748b;
+        --border-color: #e2e8f0;
+        --border-radius: 12px;
+        --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --box-shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 30px;
+        margin-top: 40px;
+        padding: 0 20px;
+        max-width: 1200px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
     .card {
-        background-color: #fff;
+        background: linear-gradient(145deg, #ffffff, #f8fafc);
         border: 1px solid var(--border-color);
         border-radius: var(--border-radius);
         box-shadow: var(--box-shadow);
-        padding: 20px;
+        padding: 30px 25px;
         text-align: center;
-        width: 300px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-color), #06b6d4);
+        transform: scaleX(0);
         transition: transform 0.3s ease;
     }
+
     .card:hover {
-        transform: translateY(-5px);
+        transform: translateY(-8px);
+        box-shadow: var(--box-shadow-hover);
+        border-color: var(--primary-color);
     }
+
+    .card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .card-icon {
+        margin-bottom: 20px;
+        position: relative;
+    }
+
+    .card-icon i {
+        font-size: 3rem;
+        color: var(--primary-color);
+        background: linear-gradient(135deg, var(--primary-color), #06b6d4);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        transition: all 0.3s ease;
+    }
+
+    .card:hover .card-icon i {
+        transform: scale(1.1);
+        filter: drop-shadow(0 4px 8px rgba(79, 70, 229, 0.3));
+    }
+
+    .card-content {
+        position: relative;
+        z-index: 1;
+    }
+
     .card h3 {
-        margin-top: 0;
-        margin-bottom: 15px;
+        margin: 0 0 15px 0;
+        font-size: 1.25rem;
+        font-weight: 600;
     }
+
     .card h3 a {
+        color: var(--text-dark);
+        text-decoration: none;
+        transition: color 0.3s ease;
+        position: relative;
+    }
+
+    .card h3 a::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: linear-gradient(90deg, var(--primary-color), #06b6d4);
+        transition: width 0.3s ease;
+    }
+
+    .card:hover h3 a {
         color: var(--primary-color);
     }
+
+    .card:hover h3 a::after {
+        width: 100%;
+    }
+
     .card p {
-        font-size: 0.95rem;
-        color: #666;
+        font-size: 0.9rem;
+        color: var(--text-light);
+        line-height: 1.5;
+        margin: 0;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .dashboard-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+            padding: 0 15px;
+        }
+
+        .card {
+            padding: 25px 20px;
+        }
+
+        .card-icon i {
+            font-size: 2.5rem;
+        }
+    }
+
+    /* Add some animation on page load */
+    .card {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeInUp 0.6s ease forwards;
+    }
+
+    .card:nth-child(2) {
+        animation-delay: 0.1s;
+    }
+
+    @keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 </style>
 </body>

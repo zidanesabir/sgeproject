@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGE Project - Edit Reclamation</title>
+    <link rel="stylesheet" th:href="@{/main.css}">
+</head>
+<body>
+<div class="header">
+    <div class="logo">SGE Project</div>
+    <nav>
+        <ul class="nav-links">
+            <li><a th:href="@{/home}">Home</a></li>
+            <li th:if="${isAdminView}"><a th:href="@{/admin/dashboard}">Dashboard</a></li>
+            <li th:if="${isProfessorView}"><a th:href="@{/professor/reclamations}">My Reclamations</a></li>
+            <li th:if="${!isAdminView and !isProfessorView}"><a th:href="@{/etudiant/reclamations}">My Reclamations</a></li>
+            <li><a th:href="@{/logout}">Logout</a></li>
+        </ul>
+    </nav>
+</div>
+
+<div class="container" style="max-width: 600px; margin-top: 30px;">
+    <h2 class="text-center">Edit Reclamation</h2>
+
+    <div th:if="${errorMessage}" class="alert alert-danger text-center" th:text="${errorMessage}"></div>
+    <div th:if="${successMessage}" class="alert alert-success text-center" th:text="${successMessage}"></div>
+
+    <form th:action="@{/reclamations/update/{id}(id=*{id})}" th:object="${reclamation}" method="post">
+        <input type="hidden" th:field="*{id}" />
+        <input type="hidden" th:field="*{etudiant.id}" />
+        <input type="hidden" th:field="*{note.id}" />
+
+        <div class="form-group">
+            <label for="studentName">Student:</label>
+            <input type="text" id="studentName" class="form-control" th:value="${reclamation.etudiant?.prenom + ' ' + reclamation.etudiant?.nom}" readonly>
+        </div>
+
+        <div class="form-group">
+            <label for="noteDetails">Note Details:</label>
+            <input type="text" id="noteDetails" class="form-control" th:value="${reclamation.note?.examen?.module?.nomModule + ' (' + reclamation.note?.examen?.typeExamen + ') - Note: ' + #numbers.formatDecimal(reclamation.note?.valeur, 0, 2)}" readonly>
+        </div>
+
+        <div class="form-group">
+            <label for="raison">Reason for Reclamation:</label>
+            <textarea id="raison" th:field="*{raison}" class="form-control" rows="5"
+                      th:attr="readonly=${reclamation.statut != 'Pending' and !isAdminView and !isProfessorView}"></textarea>
+            <p th:if="${#fields.hasErrors('raison')}" th:errors="*{raison}" class="text-danger"></p>
+        </div>
+
+        <div class="form-group">
+            <label for="statut">Status:</label>
+            <select id="statut" th:field="*{statut}" class="form-control"
+                    th:attr="disabled=${!isAdminView and !isProfessorView}">
+                <option value="Pending">Pending</option>
+                <option value="Approved">Approved</option>
+                <option value="Rejected">Rejected</option>
+            </select>
+            <p th:if="${#fields.hasErrors('statut')}" th:errors="*{statut}" class="text-danger"></p>
+        </div>
+
+        <div class="form-group text-center">
+            <button type="submit" class="btn btn-primary">Update Reclamation</button>
+            <a th:href="@{/etudiant/reclamations}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<div class="footer">
+    <p>&copy; 2025 SGE Project. All rights reserved created by Z-A-I-H.</p>
+</div>
+
+<script th:src="@{/script.js}"></script>
+</body>
+</html>

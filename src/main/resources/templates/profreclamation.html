@@ -12,9 +12,9 @@
     <nav>
         <ul class="nav-links">
 
-            <li><a th:href="@{/etudiant/relevesNotes}">My Grades</a></li>
-            <li><a th:href="@{/etudiant/reclamations}">Reclamations</a></li>
-            <li><a th:href="@{/etudiant/planningExamens}">Exam Schedule</a></li>
+            <li><a th:href="@{/professor/gestionNotes}">Manage Notes</a></li>
+            <li><a th:href="@{/professor/planningExamens}">Exam Planning</a></li>
+            <li><a th:href="@{/profreclamations}">Review Reclamations</a></li>
             <li><a th:href="@{/logout}">Logout</a></li>
         </ul>
     </nav>
@@ -24,9 +24,7 @@
     <h1 class="text-center">Manage Reclamations</h1>
     <p class="text-center">Here you can view and manage student reclamations.</p>
 
-    <div style="margin-bottom: 20px; text-align: right;">
-        <a th:href="@{/reclamations/submit}" class="btn btn-primary">Submit New Reclamation</a>
-    </div>
+
 
     <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
     <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
@@ -52,9 +50,13 @@
             <td th:text="${#temporals.format(reclamation.dateReclamation, 'yyyy-MM-dd')}">2025-07-26</td>
             <td th:text="${reclamation.statut}">Pending</td>
             <td>
-                <a th:href="@{/reclamations/edit/{id}(id=${reclamation.id})}" class="btn btn-secondary btn-sm">Edit</a>
 
-
+                <form th:action="@{/reclamations/approve/{id}(id=${reclamation.id})}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                </form>
+                <form th:action="@{/reclamations/reject/{id}(id=${reclamation.id})}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-warning btn-sm">Reject</button>
+                </form>
                 <form th:action="@{/reclamations/delete/{id}(id=${reclamation.id})}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this reclamation?');">
                     <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                 </form>
