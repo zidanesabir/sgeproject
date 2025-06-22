@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGE Project - My Grade Report</title>
+    <link rel="stylesheet" th:href="@{/main.css}">
+</head>
+<body>
+<div class="header">
+    <div class="logo">SGE Project</div>
+    <nav>
+        <ul class="nav-links">
+            <li><a th:href="@{/home}">Home</a></li>
+            <li sec:authorize="hasAuthority('ETUDIANT')"><a th:href="@{/etudiant/relevesNotes}">My Grades</a></li>
+            <li sec:authorize="hasAuthority('ETUDIANT')"><a th:href="@{/etudiant/reclamations}">Reclamations</a></li>
+            <li><a th:href="@{/logout}">Logout</a></li>
+        </ul>
+    </nav>
+</div>
+
+<div class="container">
+    <h1 class="text-center">My Grade Report</h1>
+    <p class="text-center" sec:authorize="hasAuthority('ETUDIANT')">Hello <span sec:authentication="name">Student</span>! Here is your academic performance report.</p>
+
+    <div style="margin-bottom: 20px; text-align: right;">
+        <a th:href="@{/etudiant/relevesNotes/pdf}" class="btn btn-secondary">Download PDF Report</a>
+        <a th:href="@{/etudiant/relevesNotes/excel}" class="btn btn-secondary">Export to Excel</a>
+    </div>
+
+    <h2 style="margin-top: 30px;">Notes by Module</h2>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Module</th>
+            <th>Exam Type</th>
+            <th>Date</th>
+            <th>Note (out of 20)</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="note : ${notes}">
+            <td th:text="${note.examen?.module?.nomModule}">Database</td>
+            <td th:text="${note.examen?.typeExamen}">Final</td>
+            <td th:text="${#temporals.format(note.examen?.dateExamen, 'yyyy-MM-dd')}">2024-01-15</td>
+            <td th:text="${#numbers.formatDecimal(note.valeur, 0, 2)}">15.50</td>
+        </tr>
+        <tr th:if="${notes.isEmpty()}">
+            <td colspan="4" class="text-center">No grades available yet.</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div style="margin-top: 30px; border-top: 1px solid var(--border-color); padding-top: 20px;">
+        <h3>Overall Averages:</h3>
+        <p><strong>General Average:</strong> <span th:text="${#numbers.formatDecimal(overallAverage, 0, 2)}">14.75</span> / 20</p>
+    </div>
+
+</div>
+
+<div class="footer">
+    <p>&copy; 2023 SGE Project. All rights reserved.</p>
+</div>
+
+<script th:src="@{/script.js}"></script>
+</body>
+</html>

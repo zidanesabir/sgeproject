@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"> <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGE Project - Admin Dashboard</title>
+    <link rel="stylesheet" th:href="@{/main.css}">
+</head>
+<body>
+<div class="header">
+    <div class="logo">SGE Project</div>
+    <nav>
+        <ul class="nav-links">
+            <li><a th:href="@{/home}">Home</a></li>
+            <li><a th:href="@{/admin/dashboard}">Dashboard</a></li>
+            <li><a th:href="@{/admin/gestionUtilisateurs}">Users</a></li>
+            <li><a th:href="@{/logout}">Logout</a></li>
+        </ul>
+    </nav>
+</div>
+
+<div class="container">
+    <h1 class="text-center">Admin Dashboard</h1>
+    <p class="text-center">Welcome! Here you can manage all aspects of the SGE system.</p>
+
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-top: 30px;">
+        <div class="card">
+            <h3><a th:href="@{/admin/gestionUtilisateurs}">Manage Users</a></h3>
+            <p>Add, edit, or remove students, professors, and administrators.</p>
+        </div>
+        <div class="card">
+            <h3><a th:href="@{/admin/gestionFormations}">Manage Formations</a></h3>
+            <p>Define and organize academic formations.</p>
+        </div>
+    </div>
+</div>
+
+<div class="footer">
+    <p>&copy; 2023 SGE Project. All rights reserved.</p>
+</div>
+
+<script th:src="@{/script.js}"></script>
+<style>
+    .card {
+        background-color: #fff;
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        padding: 20px;
+        text-align: center;
+        width: 300px;
+        transition: transform 0.3s ease;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+    }
+    .card h3 {
+        margin-top: 0;
+        margin-bottom: 15px;
+    }
+    .card h3 a {
+        color: var(--primary-color);
+    }
+    .card p {
+        font-size: 0.95rem;
+        color: #666;
+    }
+</style>
+</body>
+</html>

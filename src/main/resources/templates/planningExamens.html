@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGE Project - Exam Planning</title>
+    <link rel="stylesheet" th:href="@{/main.css}">
+</head>
+<body>
+<div class="header">
+    <div class="logo">SGE Project</div>
+    <nav>
+        <ul class="nav-links">
+            <li><a th:href="@{/home}">Home</a></li>
+            <li sec:authorize="hasAuthority('PROFESSOR')"><a th:href="@{/professor/gestionNotes}">Manage Notes</a></li>
+            <li sec:authorize="hasAuthority('PROFESSOR')"><a th:href="@{/professor/planningExamens}">Exam Planning</a></li>
+            <li sec:authorize="hasAuthority('ADMIN')"><a th:href="@{/admin/gestionExamens}">Manage Exams</a></li>
+            <li><a th:href="@{/logout}">Logout</a></li>
+        </ul>
+    </nav>
+</div>
+
+<div class="container">
+    <h1 class="text-center">Exam Planning</h1>
+    <p class="text-center" sec:authorize="hasAuthority('PROFESSOR')">View your assigned exam sessions.</p>
+    <p class="text-center" sec:authorize="hasAuthority('ADMIN')">Overview and manage all scheduled exam sessions.</p>
+
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Exam Title</th>
+            <th>Module</th>
+            <th>Date</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Room</th>
+            <th>Supervisor(s)</th>
+            <th sec:authorize="hasAuthority('ADMIN')">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="session : ${examSessions}">
+            <td th:text="${session.examen?.module?.nomModule} + ' ' + ${session.examen?.typeExamen}">Data Structures Final</td>
+            <td th:text="${session.examen?.module?.nomModule}">Data Structures</td>
+            <td th:text="${#temporals.format(session.heureDebut, 'yyyy-MM-dd')}">2024-01-20</td>
+            <td th:text="${#temporals.format(session.heureDebut, 'HH:mm')}">09:00</td>
+            <td th:text="${#temporals.format(session.heureFin, 'HH:mm')}">11:00</td>
+            <td th:text="${session.salle?.nomSalle}">Room B203</td>
+            <td>
+                <span th:each="prof : ${session.superviseurs}" th:text="${prof.nom} + ' ' + ${prof.prenom} + ' '"></span>
+                <span th:if="${session.superviseurs.isEmpty()}">N/A</span>
+            </td>
+            <td sec:authorize="hasAuthority('ADMIN')">
+                <a th:href="@{/admin/sessions/edit/{id}(id=${session.id})}" class="btn btn-secondary btn-sm">Edit</a>
+                <form th:action="@{/admin/sessions/delete/{id}(id=${session.id})}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this session?');">
+                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </form>
+            </td>
+        </tr>
+        <tr th:if="${examSessions.isEmpty()}">
+            <td th:colspan="${#authorization.expression('hasAuthority(\'ADMIN\')') ? 8 : 7}" class="text-center">No exam sessions scheduled.</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="footer">
+    <p>&copy; 2023 SGE Project. All rights reserved.</p>
+</div>
+
+<script th:src="@{/script.js}"></script>
+</body>
+</html>

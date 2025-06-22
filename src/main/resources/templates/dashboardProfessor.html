@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGE Project - Professor Dashboard</title>
+    <link rel="stylesheet" th:href="@{/main.css}">
+</head>
+<body>
+<div class="header">
+    <div class="logo">SGE Project</div>
+    <nav>
+        <ul class="nav-links">
+            <li><a th:href="@{/home}">Home</a></li>
+            <li><a th:href="@{/professor/gestionNotes}">Manage Notes</a></li>
+            <li><a th:href="@{/professor/planningExamens}">Exam Planning</a></li>
+            <li><a th:href="@{/logout}">Logout</a></li>
+        </ul>
+    </nav>
+</div>
+
+<div class="container">
+    <h1 class="text-center">Professor Dashboard</h1>
+    <p class="text-center">Welcome, <span sec:authentication="name">Professor</span>! Here are your teaching management options.</p>
+
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-top: 30px;">
+        <div class="card">
+            <h3><a th:href="@{/professor/gestionNotes}">Manage Notes</a></h3>
+            <p>Enter and modify student grades for your assigned modules.</p>
+        </div>
+        <div class="card">
+            <h3><a th:href="@{/professor/planningExamens}">Exam Planning</a></h3>
+            <p>View exam schedules and assigned supervision duties.</p>
+        </div>
+        <div class="card">
+            <h3><a th:href="@{/reclamations}">Review Reclamations</a></h3>
+            <p>Handle student reclamations regarding grades.</p>
+        </div>
+    </div>
+</div>
+
+<div class="footer">
+    <p>&copy; 2023 SGE Project. All rights reserved.</p>
+</div>
+
+<script th:src="@{/script.js}"></script>
+<style>
+    .card {
+        background-color: #fff;
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        padding: 20px;
+        text-align: center;
+        width: 300px;
+        transition: transform 0.3s ease;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+    }
+    .card h3 {
+        margin-top: 0;
+        margin-bottom: 15px;
+    }
+    .card h3 a {
+        color: var(--primary-color);
+    }
+    .card p {
+        font-size: 0.95rem;
+        color: #666;
+    }
+</style>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGE Project - Home</title>
+    <link rel="stylesheet" th:href="@{/main.css}">
+</head>
+<body>
+<div class="header">
+    <div class="logo">SGE Project</div>
+    <nav>
+        <ul class="nav-links">
+            <li><a th:href="@{/home}">Home</a></li>
+            <li sec:authorize="hasAuthority('ADMIN')"><a th:href="@{/admin/dashboard}">Admin Dashboard</a></li>
+            <li sec:authorize="hasAuthority('PROFESSOR')"><a th:href="@{/professor/dashboard}">Professor Dashboard</a></li>
+            <li sec:authorize="hasAuthority('ETUDIANT')"><a th:href="@{/etudiant/results}">My Results</a></li>
+            <li><a th:href="@{/logout}">Logout</a></li>
+        </ul>
+    </nav>
+</div>
+
+<div class="container">
+    <h1 class="text-center">Welcome to the SGE Project!</h1>
+    <p class="text-center">This is your personalized home page.</p>
+
+    <div class="text-center" sec:authorize="isAuthenticated()">
+        <p>You are logged in as <span sec:authentication="name">User</span>.</p>
+        <p>Your roles: <span sec:authentication="authorities">Roles</span></p>
+    </div>
+
+    <div class="text-center" style="margin-top: 30px;">
+        <h3>Quick Actions:</h3>
+        <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+            <div sec:authorize="hasAuthority('ADMIN')">
+                <a th:href="@{/admin/gestionUtilisateurs}" class="btn btn-primary">Manage Users</a>
+                <a th:href="@{/admin/statistiques}" class="btn btn-secondary">View Statistics</a>
+            </div>
+            <div sec:authorize="hasAuthority('PROFESSOR')">
+                <a th:href="@{/professor/gestionNotes}" class="btn btn-primary">Enter Notes</a>
+                <a th:href="@{/professor/planningExamens}" class="btn btn-secondary">Exam Planning</a>
+            </div>
+            <div sec:authorize="hasAuthority('ETUDIANT')">
+                <a th:href="@{/etudiant/relevesNotes}" class="btn btn-primary">View My Grades</a>
+                <a th:href="@{/etudiant/reclamations}" class="btn btn-secondary">Submit Reclamation</a>
+            </div>
+            <a th:href="@{/logout}" class="btn btn-danger">Logout</a>
+        </div>
+    </div>
+
+</div>
+
+<div class="footer">
+    <p>&copy; 2023 SGE Project. All rights reserved.</p>
+</div>
+
+<script th:src="@{/script.js}"></script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGE Project - Manage Formations</title>
+    <link rel="stylesheet" th:href="@{/main.css}">
+</head>
+<body>
+<div class="header">
+    <div class="logo">SGE Project</div>
+    <nav>
+        <ul class="nav-links">
+            <li><a th:href="@{/home}">Home</a></li>
+            <li><a th:href="@{/admin/dashboard}">Dashboard</a></li>
+            <li><a th:href="@{/admin/gestionUtilisateurs}">Users</a></li>
+            <li><a th:href="@{/admin/gestionFormations}">Formations</a></li>
+            <li><a th:href="@{/admin/gestionModules}">Modules</a></li>
+            <li><a th:href="@{/admin/gestionSalles}">Rooms</a></li>
+            <li><a th:href="@{/admin/gestionExamens}">Exams</a></li>
+            <li><a th:href="@{/admin/statistiques}">Stats</a></li>
+            <li><a th:href="@{/logout}">Logout</a></li>
+        </ul>
+    </nav>
+</div>
+
+<div class="container">
+    <h1 class="text-center">Manage Formations</h1>
+    <p class="text-center">Here you can add, edit, and delete academic formations.</p>
+
+    <div style="margin-bottom: 20px; text-align: right;">
+        <a th:href="@{/admin/formations/new}" class="btn btn-success">Add New Formation</a>
+    </div>
+
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="formation : ${formations}">
+            <td th:text="${formation.id}">1</td>
+            <td th:text="${formation.nomFormation}">Computer Science</td>
+            <td th:text="${formation.description}">Bachelor's degree in Computer Science.</td>
+            <td>
+                <a th:href="@{/admin/formations/edit/{id}(id=${formation.id})}" class="btn btn-secondary btn-sm">Edit</a>
+                <form th:action="@{/admin/formations/delete/{id}(id=${formation.id})}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this formation?');">
+                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </form>
+            </td>
+        </tr>
+        <tr th:if="${formations.isEmpty()}">
+            <td colspan="4" class="text-center">No formations found.</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="footer">
+    <p>&copy; 2023 SGE Project. All rights reserved.</p>
+</div>
+
+<script th:src="@{/script.js}"></script>
+</body>
+</html>

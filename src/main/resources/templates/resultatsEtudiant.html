@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGE Project - My Exam Results</title>
+    <link rel="stylesheet" th:href="@{/main.css}">
+</head>
+<body>
+<div class="header">
+    <div class="logo">SGE Project</div>
+    <nav>
+        <ul class="nav-links">
+            <li><a th:href="@{/home}">Home</a></li>
+            <li sec:authorize="hasAuthority('ETUDIANT')"><a th:href="@{/etudiant/relevesNotes}">My Grades</a></li>
+            <li sec:authorize="hasAuthority('ETUDIANT')"><a th:href="@{/etudiant/reclamations}">Reclamations</a></li>
+            <li><a th:href="@{/logout}">Logout</a></li>
+        </ul>
+    </nav>
+</div>
+
+<div class="container">
+    <h1 class="text-center">My Exam Results</h1>
+    <p class="text-center">Detailed results for your exams and module validations.</p>
+
+    <h2 style="margin-top: 30px;">Module Validation Status</h2>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Module</th>
+            <th>Final Grade</th>
+            <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="moduleResult : ${moduleResults}">
+            <td th:text="${moduleResult.moduleName}">Algorithms</td>
+            <td th:text="${#numbers.formatDecimal(moduleResult.finalGrade, 0, 2)}">13.25</td>
+            <td>
+                <span th:classappend="${moduleResult.passed} ? 'text-success' : 'text-danger'" th:text="${moduleResult.passed} ? 'Validated' : 'Failed'">Validated</span>
+            </td>
+        </tr>
+        <tr th:if="${moduleResults.isEmpty()}">
+            <td colspan="3" class="text-center">No module results available yet.</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h2 style="margin-top: 30px;">Individual Exam Scores</h2>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Exam</th>
+            <th>Date</th>
+            <th>Score (out of 20)</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="examScore : ${examScores}">
+            <td th:text="${examScore.examen?.module?.nomModule} + ' - ' + ${examScore.examen?.typeExamen}">Database - Midterm</td>
+            <td th:text="${#temporals.format(examScore.examen?.dateExamen, 'yyyy-MM-dd')}">2023-12-10</td>
+            <td th:text="${#numbers.formatDecimal(examScore.noteValue, 0, 2)}">14.00</td>
+        </tr>
+        <tr th:if="${examScores.isEmpty()}">
+            <td colspan="3" class="text-center">No individual exam scores available yet.</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="footer">
+    <p>&copy; 2023 SGE Project. All rights reserved.</p>
+</div>
+
+<script th:src="@{/script.js}"></script>
+<style>
+    .text-success {
+        color: var(--accent-color);
+        font-weight: bold;
+    }
+    .text-danger {
+        color: var(--danger-color);
+        font-weight: bold;
+    }
+</style>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGE Project - Login</title>
+    <link rel="stylesheet" th:href="@{/main.css}">
+</head>
+<body>
+<div class="header">
+    <div class="logo">SGE Project</div>
+</div>
+
+<div class="container" style="max-width: 500px; margin-top: 50px;">
+    <h2 class="text-center">Login</h2>
+
+    <div th:if="${errorMessage}" class="alert alert-danger text-center" th:text="${errorMessage}"></div>
+    <div th:if="${successMessage}" class="alert alert-success text-center" th:text="${successMessage}"></div>
+    <div th:if="${infoMessage}" class="alert alert-info text-center" th:text="${infoMessage}"></div>
+
+    <form th:action="@{/manualLogin}" method="post">
+        <div class="form-group">
+            <label for="username">Email (Username):</label>
+            <input type="email" id="username" name="email" class="form-control" required autofocus>
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" class="form-control" required>
+        </div>
+        <div class="form-group text-center">
+            <button type="submit" class="btn btn-primary">Login</button>
+        </div>
+    </form>
+    <p class="text-center" style="margin-top: 20px;">
+        Don't have an account? <a th:href="@{/register}">Register here</a>
+    </p>
+</div>
+
+<div class="footer">
+    <p>&copy; 2023 SGE Project. All rights reserved.</p>
+</div>
+
+<script th:src="@{/script.js}"></script>
+</body>
+</html>

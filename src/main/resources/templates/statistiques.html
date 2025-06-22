@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGE Project - Statistics</title>
+    <link rel="stylesheet" th:href="@{/main.css}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Existing CSS for .stats-grid, .stat-card etc. should be here */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+            margin-bottom: 40px;
+        }
+        .stat-card {
+            background-color: #e9f5ff; /* A lighter blue */
+            border: 1px solid #cce5ff;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .stat-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+        .stat-card p {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--dark-bg);
+            margin: 0;
+        }
+        /* Make canvas elements responsive within their containers */
+        canvas {
+            max-width: 100%;
+            height: auto; /* Allow height to adjust */
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <div class="logo">SGE Project</div>
+    <nav>
+        <ul class="nav-links">
+            <li><a th:href="@{/home}">Home</a></li>
+            <li><a th:href="@{/admin/dashboard}">Dashboard</a></li>
+            <li><a th:href="@{/admin/gestionUtilisateurs}">Users</a></li>
+            <li><a th:href="@{/admin/gestionFormations}">Formations</a></li>
+            <li><a th:href="@{/admin/gestionModules}">Modules</a></li>
+            <li><a th:href="@{/admin/gestionSalles}">Rooms</a></li>
+            <li><a th:href="@{/admin/gestionExamens}">Exams</a></li>
+            <li><a th:href="@{/admin/statistiques}">Stats</a></li>
+            <li><a th:href="@{/logout}">Logout</a></li>
+        </ul>
+    </nav>
+</div>
+
+<div class="container">
+    <h1 class="text-center">System Statistics</h1>
+    <p class="text-center">Here you can view various statistical insights about the SGE system.</p>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Total Students</h3>
+            <p th:text="${totalStudents}">0</p> </div>
+        <div class="stat-card">
+            <h3>Total Professors</h3>
+            <p th:text="${totalProfessors}">0</p> </div>
+        <div class="stat-card">
+            <h3>Total Exams</h3>
+            <p th:text="${totalExams}">0</p> </div>
+        <div class="stat-card">
+            <h3>Average Note (Overall)</h3>
+            <p th:text="${#numbers.formatDecimal(averageOverallNote, 0, 2)}">0.00</p> </div>
+    </div>
+
+    <h2 style="margin-top: 40px;">Grade Distribution (Overall)</h2>
+    <div style="width: 80%; margin: auto;">
+        <canvas id="gradeDistributionChart"></canvas>
+    </div>
+
+    <h2 style="margin-top: 40px;">Module Performance (Top 5)</h2>
+    <div style="width: 80%; margin: auto;">
+        <canvas id="modulePerformanceChart"></canvas>
+    </div>
+
+</div>
+
+<script th:src="@{/script.js}"></script>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    console.log("--- Chart Data from Thymeleaf Model ---");
+
+    const gradeRanges = /*[[${gradeRanges}]]*/ [];
+    const gradeCounts = /*[[${gradeCounts}]]*/ [];
+    console.log("Grade Ranges:", gradeRanges);
+    console.log("Grade Counts:", gradeCounts);
+
+    const moduleNames = /*[[${topModulesNames}]]*/ [];
+    const moduleAverages = /*[[${topModulesAverages}]]*/ [];
+    console.log("Module Names:", moduleNames);
+    console.log("Module Averages:", moduleAverages);
+
+    console.log("--- Initializing Charts ---");
+
+    // Check if Chart.js is loaded and data is present before initializing
+    if (typeof Chart === 'undefined') {
+        console.error("Chart.js library is not loaded!");
+    } else if (gradeRanges.length === 0 || gradeCounts.length === 0) {
+        console.warn("Grade Distribution data is empty. Chart will not render.");
+        // Optionally, display a message on the canvas itself
+        const gradeCanvas = document.getElementById('gradeDistributionChart');
+        const gradeCtx = gradeCanvas.getContext('2d');
+        gradeCtx.font = '16px Arial';
+        gradeCtx.textAlign = 'center';
+        gradeCtx.fillText('No data available for Grade Distribution.', gradeCanvas.width / 2, gradeCanvas.height / 2);
+    } else {
+        // Grade Distribution Chart initialization
+        const gradeCtx = document.getElementById('gradeDistributionChart').getContext('2d');
+        const gradeChart = new Chart(gradeCtx, {
+            type: 'bar',
+            data: {
+                labels: gradeRanges,
+                datasets: [{
+                    label: 'Number of Students',
+                    data: gradeCounts,
+                    backgroundColor: 'rgba(0, 123, 255, 0.7)',
+                    borderColor: 'rgba(0, 123, 255, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false, // Allow charts to resize more freely
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Number of Students'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Grade Range'
+                        }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Overall Grade Distribution'
+                    }
+                }
+            }
+        });
+    }
+
+    if (typeof Chart === 'undefined') {
+        // Already logged above
+    } else if (moduleNames.length === 0 || moduleAverages.length === 0) {
+        console.warn("Module Performance data is empty. Chart will not render.");
+        // Optionally, display a message on the canvas itself
+        const moduleCanvas = document.getElementById('modulePerformanceChart');
+        const moduleCtx = moduleCanvas.getContext('2d');
+        moduleCtx.font = '16px Arial';
+        moduleCtx.textAlign = 'center';
+        moduleCtx.fillText('No data available for Module Performance.', moduleCanvas.width / 2, moduleCanvas.height / 2);
+    } else {
+        // Module Performance Chart initialization
+        const moduleCtx = document.getElementById('modulePerformanceChart').getContext('2d');
+        const moduleChart = new Chart(moduleCtx, {
+            type: 'line',
+            data: {
+                labels: moduleNames,
+                datasets: [{
+                    label: 'Average Note',
+                    data: moduleAverages,
+                    backgroundColor: 'rgba(40, 167, 69, 0.5)',
+                    borderColor: 'rgba(40, 167, 69, 1)',
+                    borderWidth: 2,
+                    fill: false,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false, // Allow charts to resize more freely
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 20,
+                        title: {
+                            display: true,
+                            text: 'Average Note (out of 20)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Module'
+                        }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Top Module Performance by Average Note'
+                    }
+                }
+            }
+        });
+    }
+    /*]]>*/
+</script>
+</body>
+</html>

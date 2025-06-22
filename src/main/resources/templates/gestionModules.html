@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGE Project - Manage Modules</title>
+    <link rel="stylesheet" th:href="@{/main.css}">
+</head>
+<body>
+<div class="header">
+    <div class="logo">SGE Project</div>
+    <nav>
+        <ul class="nav-links">
+            <li><a th:href="@{/home}">Home</a></li>
+            <li><a th:href="@{/admin/dashboard}">Dashboard</a></li>
+            <li><a th:href="@{/admin/gestionUtilisateurs}">Users</a></li>
+            <li><a th:href="@{/admin/gestionFormations}">Formations</a></li>
+            <li><a th:href="@{/admin/gestionModules}">Modules</a></li>
+            <li><a th:href="@{/admin/gestionSalles}">Rooms</a></li>
+            <li><a th:href="@{/admin/gestionExamens}">Exams</a></li>
+            <li><a th:href="@{/admin/statistiques}">Stats</a></li>
+            <li><a th:href="@{/logout}">Logout</a></li>
+        </ul>
+    </nav>
+</div>
+
+<div class="container">
+    <h1 class="text-center">Manage Modules</h1>
+    <p class="text-center">Here you can add, edit, and delete modules for different formations.</p>
+
+    <div style="margin-bottom: 20px; text-align: right;">
+        <a th:href="@{/admin/modules/new}" class="btn btn-success">Add New Module</a>
+    </div>
+
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Formation</th>
+            <th>Professor</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="module : ${modules}">
+            <td th:text="${module.id}">1</td>
+            <td th:text="${module.nomModule}">Data Structures</td>
+            <td th:text="${module.formation?.nomFormation ?: 'N/A'}">Computer Science</td>
+            <td th:text="${module.professeur?.nom} + ' ' + ${module.professeur?.prenom}">Dr. Smith</td>
+            <td>
+                <a th:href="@{/admin/modules/edit/{id}(id=${module.id})}" class="btn btn-secondary btn-sm">Edit</a>
+                <form th:action="@{/admin/modules/delete/{id}(id=${module.id})}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this module?');">
+                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </form>
+            </td>
+        </tr>
+        <tr th:if="${modules.isEmpty()}">
+            <td colspan="5" class="text-center">No modules found.</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="footer">
+    <p>&copy; 2023 SGE Project. All rights reserved.</p>
+</div>
+
+<script th:src="@{/script.js}"></script>
+</body>
+</html>

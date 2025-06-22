@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGE Project - Manage Notes</title>
+    <link rel="stylesheet" th:href="@{/main.css}">
+</head>
+<body>
+<div class="header">
+    <div class="logo">SGE Project</div>
+    <nav>
+        <ul class="nav-links">
+            <li><a th:href="@{/home}">Home</a></li>
+            <li sec:authorize="hasAuthority('PROFESSOR')"><a th:href="@{/professor/gestionNotes}">Manage Notes</a></li>
+            <li sec:authorize="hasAuthority('PROFESSOR')"><a th:href="@{/professor/planningExamens}">Exam Planning</a></li>
+            <li><a th:href="@{/logout}">Logout</a></li>
+        </ul>
+    </nav>
+</div>
+
+<div class="container">
+    <h1 class="text-center">Manage Student Notes</h1>
+    <p class="text-center" sec:authorize="hasAuthority('PROFESSOR')">Welcome, <span sec:authentication="name">Professor</span>! Here you can enter and update notes for your modules.</p>
+    <p class="text-center" sec:authorize="hasAuthority('ADMIN')">As an admin, you can oversee all notes.</p>
+
+
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+    <div class="form-group">
+        <label for="moduleSelect">Select Module:</label>
+        <select id="moduleSelect" class="form-control">
+            <option value="">-- Select a Module --</option>
+            <option th:each="module : ${modules}" th:value="${module.id}" th:text="${module.nomModule}"></option>
+        </select>
+    </div>
+
+    <div id="notesTableContainer" style="margin-top: 20px;">
+        <h2>Notes for <span id="selectedModuleName">Selected Module</span></h2>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Student ID</th>
+                <th>Student Name</th>
+                <th>Exam</th>
+                <th>Note</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody id="notesTableBody">
+            <tr>
+                <td>1001</td>
+                <td>Alice Smith</td>
+                <td>Midterm (Database)</td>
+                <td><input type="number" step="0.01" value="15.5" class="form-control"></td>
+                <td><button class="btn btn-primary btn-sm">Save</button></td>
+            </tr>
+            <tr>
+                <td colspan="5" class="text-center">Select a module to view notes.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<div class="footer">
+    <p>&copy; 2023 SGE Project. All rights reserved.</p>
+</div>
+
+<script th:src="@{/script.js}"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const selectedModuleElement = document.getElementById('selectedModuleName');
+    const notesTableBody = document.getElementById('notesTableBody');
+    const moduleSelect = document.getElementById('moduleSelect');
+
+    // This is a simplified example. In a real application, you'd make an AJAX call
+    // to your Spring Boot backend to fetch notes for the selected module.
+    // You'd also need to handle saving notes individually or in bulk.
+
+    moduleSelect.addEventListener('change', function() {
+        const moduleId = this.value;
+        const moduleName = this.options[this.selectedIndex].text;
+
+        if (moduleId) {
+            selectedModuleElement.textContent = moduleName;
+            // Simulate fetching notes for the module
+            fetchNotesForModule(moduleId);
+        } else {
+            selectedModuleElement.textContent = 'Selected Module';
+            notesTableBody.innerHTML = '<tr><td colspan="5" class="text-center">Select a module to view notes.</td></tr>';
+        }
+    });
+
+    function fetchNotesForModule(moduleId) {
+        // In a real app, this would be an API call, e.g.:
+        // fetch(`/api/notes/module/${moduleId}`)
+        //     .then(response => response.json())
+        //     .then(data => {
+        //         populateNotesTable(data);
+        //     })
+        //     .catch(error => {
+        //         console.error('Error fetching notes:', error);
+        //         notesTableBody.innerHTML = '<tr><td colspan="5" class="text-center alert-danger">Error loading notes.</td></tr>';
+        //     });
+
+        // --- Mock data for demonstration ---
+        const mockNotes = [
+            { studentId: 101, studentName: 'Alice Johnson', examName: 'Midterm (Module X)', note: 16.0 },
+            { studentId: 102, studentName: 'Bob Williams', examName: 'Midterm (Module X)', note: 12.5 },
+            { studentId: 103, studentName: 'Charlie Brown', examName: 'Final (Module X)', note: 18.0 },
+        ];
+
+        notesTableBody.innerHTML = ''; // Clear existing rows
+        if (mockNotes.length > 0) {
+            mockNotes.forEach(note => {
+                const row = notesTableBody.insertRow();
+                row.innerHTML = `
+                        <td>${note.studentId}</td>
+                        <td>${note.studentName}</td>
+                        <td>${note.examName}</td>
+                        <td><input type="number" step="0.01" value="${note.note}" class="form-control" data-student-id="${note.studentId}"></td>
+                        <td><button class="btn btn-primary btn-sm save-note-btn" data-student-id="${note.studentId}">Save</button></td>
+                    `;
+            });
+
+            // Add event listeners to newly created save buttons
+            notesTableBody.querySelectorAll('.save-note-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const studentId = this.dataset.studentId;
+                    const noteInput = notesTableBody.querySelector(`input[data-student-id="${studentId}"]`);
+                    const newNote = noteInput.value;
+                    if (newNote !== "" && !isNaN(newNote)) {
+                        // In a real app, send newNote and studentId to backend via AJAX
+                        console.log(`Saving note ${newNote} for student ${studentId}`);
+                        showMessage(`Note ${newNote} saved for student ${studentId}`, 'success');
+                    } else {
+                        showMessage('Invalid note value.', 'danger');
+                    }
+                });
+            });
+
+        } else {
+            notesTableBody.innerHTML = '<tr><td colspan="5" class="text-center">No notes available for this module.</td></tr>';
+        }
+    }
+    /*]]>*/
+</script>
+</body>
+</html>

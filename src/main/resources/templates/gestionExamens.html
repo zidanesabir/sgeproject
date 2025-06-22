@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGE Project - Manage Exams</title>
+    <link rel="stylesheet" th:href="@{/main.css}">
+</head>
+<body>
+<div class="header">
+    <div class="logo">SGE Project</div>
+    <nav>
+        <ul class="nav-links">
+            <li><a th:href="@{/home}">Home</a></li>
+            <li><a th:href="@{/admin/dashboard}">Dashboard</a></li>
+            <li><a th:href="@{/admin/gestionUtilisateurs}">Users</a></li>
+            <li><a th:href="@{/admin/gestionFormations}">Formations</a></li>
+            <li><a th:href="@{/admin/gestionModules}">Modules</a></li>
+            <li><a th:href="@{/admin/gestionSalles}">Rooms</a></li>
+            <li><a th:href="@{/admin/gestionExamens}">Exams</a></li>
+            <li><a th:href="@{/admin/statistiques}">Stats</a></li>
+            <li><a th:href="@{/logout}">Logout</a></li>
+        </ul>
+    </nav>
+</div>
+
+<div class="container">
+    <h1 class="text-center">Manage Exams and Sessions</h1>
+    <p class="text-center">Here you can manage exam details, subjects, and schedule exam sessions.</p>
+
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+    <div style="margin-bottom: 20px; text-align: right;">
+        <a th:href="@{/admin/gestionExamens/new}" class="btn btn-success">Add New Exam</a>
+    </div>
+
+    <h2>Existing Exams</h2>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Module</th>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="examen : ${examens}">
+            <td th:text="${examen.id}">1</td>
+            <td th:text="${examen.module?.nomModule}">Database</td>
+            <td th:text="${#temporals.format(examen.dateExamen, 'yyyy-MM-dd')}">2024-01-15</td>
+            <td th:text="${examen.typeExamen}">Final</td>
+            <td>
+                <a th:href="@{/admin/gestionExamens/edit/{id}(id=${examen.id})}" class="btn btn-secondary btn-sm">Edit</a>
+                <form th:action="@{/admin/gestionExamens/delete/{id}(id=${examen.id})}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this exam?');">
+                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </form>
+            </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(examens)}">
+            <td colspan="5" class="text-center">No exams found.</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h2 style="margin-top: 30px;">Exam Sessions</h2>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Exam</th>
+            <th>Room</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="examSession : ${sessions}">
+            <td th:text="${examSession.id}">1</td>
+            <td th:text="${examSession.examen?.module?.nomModule} + ' (' + ${#temporals.format(examSession.examen?.dateExamen, 'yyyy-MM-dd')} + ')'">Database (2024-01-15)</td>
+            <td th:text="${examSession.salle?.nomSalle}">Amphi A</td>
+            <td th:text="${#temporals.format(examSession.heureDebut, 'HH:mm')}">09:00</td>
+            <td th:text="${#temporals.format(examSession.heureFin, 'HH:mm')}">11:00</td>
+            <td>
+                <a th:href="@{/admin/gestionSessions/edit/{id}(id=${examSession.id})}" class="btn btn-secondary btn-sm">Edit</a>
+                <form th:action="@{/admin/gestionSessions/delete/{id}(id=${examSession.id})}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this session?');">
+                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </form>
+            </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(sessions)}">
+            <td colspan="6" class="text-center">No exam sessions found.</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="footer">
+    <p>&copy; 2023 SGE Project. All rights reserved.</p>
+</div>
+
+<script th:src="@{/script.js}"></script>
+<style>
+    .btn-sm {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+        margin-right: 5px;
+    }
+</style>
+</body>
+</html>
