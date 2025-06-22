@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,71 +12,59 @@
     <nav>
         <ul class="nav-links">
             <li><a th:href="@{/home}">Home</a></li>
-            <li sec:authorize="hasAuthority('ETUDIANT')"><a th:href="@{/etudiant/relevesNotes}">My Grades</a></li>
-            <li sec:authorize="hasAuthority('ETUDIANT')"><a th:href="@{/etudiant/reclamations}">Reclamations</a></li>
-            <li sec:authorize="hasAuthority('PROFESSOR') or hasAuthority('ADMIN')"><a th:href="@{/reclamations}">View Reclamations</a></li>
+            <li><a th:href="@{/etudiant/relevesNotes}">My Grades</a></li>
+            <li><a th:href="@{/etudiant/reclamations}">Reclamations</a></li>
             <li><a th:href="@{/logout}">Logout</a></li>
         </ul>
     </nav>
 </div>
 
 <div class="container">
-    <h1 class="text-center">Reclamations</h1>
-    <p class="text-center">Submit a reclamation regarding your grades or view existing reclamations.</p>
+    <h1 class="text-center">Manage Reclamations</h1>
+    <p class="text-center">Here you can view and manage student reclamations.</p>
+
+    <div style="margin-bottom: 20px; text-align: right;">
+        <a th:href="@{/reclamations/submit}" class="btn btn-primary">Submit New Reclamation</a>
+    </div>
 
     <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
     <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
 
-    <div sec:authorize="hasAuthority('ETUDIANT')" style="margin-bottom: 40px;">
-        <h2>Submit New Reclamation</h2>
-        <form th:action="@{/reclamations/submit}" method="post">
-            <div class="form-group">
-                <label for="noteId">Select Grade:</label>
-                <select id="noteId" name="noteId" class="form-control" required>
-                    <option value="">-- Select a Grade to Reclaim --</option>
-                    <option th:each="note : ${studentNotes}" th:value="${note.id}" th:text="${note.examen?.module?.nomModule} + ' - ' + ${note.examen?.typeExamen} + ' (' + ${#numbers.formatDecimal(note.valeur, 0, 2)} + ')'"></option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="raison">Reason for Reclamation:</label>
-                <textarea id="raison" name="raison" rows="5" class="form-control" required placeholder="Describe your reason in detail..."></textarea>
-            </div>
-            <div class="text-center">
-                <button type="submit" class="btn btn-primary">Submit Reclamation</button>
-            </div>
-        </form>
-    </div>
-
-    <h2>Existing Reclamations</h2>
     <table class="table">
         <thead>
         <tr>
             <th>ID</th>
-            <th>Student</th>
-            <th>Module</th>
-            <th>Exam Type</th>
-            <th>Original Note</th>
+            <th>Student Name</th>
+            <th>Note ID</th>
             <th>Reason</th>
+            <th>Date</th>
             <th>Status</th>
-            <th sec:authorize="hasAnyAuthority('PROFESSOR', 'ADMIN')">Actions</th>
+            <th>Actions</th>
         </tr>
         </thead>
         <tbody>
         <tr th:each="reclamation : ${reclamations}">
             <td th:text="${reclamation.id}">1</td>
-            <td th:text="${reclamation.etudiant?.nom} + ' ' + ${reclamation.etudiant?.prenom}">Student Name</td>
-            <td th:text="${reclamation.note?.examen?.module?.nomModule}">Database</td>
-            <td th:text="${reclamation.note?.examen?.typeExamen}">Final</td>
-            <td th:text="${#numbers.formatDecimal(reclamation.note?.valeur, 0, 2)}">15.50</td>
-            <td th:text="${reclamation.raison}">My note is incorrect.</td>
+            <td th:text="${reclamation.etudiant?.prenom} + ' ' + ${reclamation.etudiant?.nom}">Alice Dupont</td>
+            <td th:text="${reclamation.note?.id}">101</td>
+            <td th:text="${reclamation.raison}">Grade discrepancy</td>
+            <td th:text="${#temporals.format(reclamation.dateReclamation, 'yyyy-MM-dd')}">2025-07-26</td>
             <td th:text="${reclamation.statut}">Pending</td>
-            <td sec:authorize="hasAnyAuthority('PROFESSOR', 'ADMIN')">
-                <a th:if="${reclamation.statut == 'Pending'}" th:href="@{/reclamations/approve/{id}(id=${reclamation.id})}" class="btn btn-success btn-sm">Approve</a>
-                <a th:if="${reclamation.statut == 'Pending'}" th:href="@{/reclamations/reject/{id}(id=${reclamation.id})}" class="btn btn-danger btn-sm">Reject</a>
+            <td>
+                <a th:href="@{/reclamations/edit/{id}(id=${reclamation.id})}" class="btn btn-secondary btn-sm">Edit</a>
+                <form th:action="@{/reclamations/approve/{id}(id=${reclamation.id})}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                </form>
+                <form th:action="@{/reclamations/reject/{id}(id=${reclamation.id})}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-warning btn-sm">Reject</button>
+                </form>
+                <form th:action="@{/reclamations/delete/{id}(id=${reclamation.id})}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this reclamation?');">
+                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </form>
             </td>
         </tr>
         <tr th:if="${reclamations.isEmpty()}">
-            <td th:colspan="${#authorization.expression('hasAnyAuthority(\'PROFESSOR\', \'ADMIN\')') ? 8 : 7}" class="text-center">No reclamations found.</td>
+            <td colspan="7" class="text-center">No reclamations found.</td>
         </tr>
         </tbody>
     </table>
@@ -89,5 +76,12 @@
 </div>
 
 <script th:src="@{/script.js}"></script>
+<style>
+    .btn-sm {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+        margin-right: 5px;
+    }
+</style>
 </body>
 </html>

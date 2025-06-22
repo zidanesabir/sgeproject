@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGE Project - Create Formation</title>
+    <link rel="stylesheet" th:href="@{/main.css}">
+</head>
+<body>
+<div class="header">
+    <div class="logo">SGE Project</div>
+    <nav>
+        <ul class="nav-links">
+            <li><a th:href="@{/home}">Home</a></li>
+            <li><a th:href="@{/admin/dashboard}">Dashboard</a></li>
+            <li><a th:href="@{/admin/gestionUtilisateurs}">Users</a></li>
+            <li><a th:href="@{/admin/gestionFormations}">Formations</a></li>
+            <li><a th:href="@{/admin/gestionModules}">Modules</a></li>
+            <li><a th:href="@{/admin/gestionSalles}">Rooms</a></li>
+            <li><a th:href="@{/admin/gestionExamens}">Exams</a></li>
+            <li><a th:href="@{/admin/statistiques}">Stats</a></li>
+            <li><a th:href="@{/logout}">Logout</a></li>
+        </ul>
+    </nav>
+</div>
+
+<div class="container" style="max-width: 600px; margin-top: 30px;">
+    <h2 class="text-center">Create New Formation</h2>
+
+    <div th:if="${errorMessage}" class="alert alert-danger text-center" th:text="${errorMessage}"></div>
+    <div th:if="${successMessage}" class="alert alert-success text-center" th:text="${successMessage}"></div>
+
+    <form th:action="@{/admin/gestionFormations/save}" th:object="${formation}" method="post">
+        <div class="form-group">
+            <label for="nomFormation">Formation Name:</label>
+            <input type="text" id="nomFormation" th:field="*{nomFormation}" class="form-control" required autofocus>
+            <p th:if="${#fields.hasErrors('nomFormation')}" th:errors="*{nomFormation}" class="text-danger"></p>
+        </div>
+        <div class="form-group">
+            <label for="description">Description:</label>
+            <textarea id="description" th:field="*{description}" class="form-control"></textarea>
+            <p th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="text-danger"></p>
+        </div>
+        <div class="form-group text-center">
+            <button type="submit" class="btn btn-primary">Save Formation</button>
+            <a th:href="@{/admin/gestionFormations}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<div class="footer">
+    <p>&copy; 2023 SGE Project. All rights reserved.</p>
+</div>
+
+<script th:src="@{/script.js}"></script>
+</body>
+</html>

@@ -6,8 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 import java.time.LocalTime;
+import java.util.HashSet; // For HashSet initialization
 import java.util.Set;
-import java.util.HashSet; // Import for HashSet initialization if needed
 
 @Data
 @NoArgsConstructor
@@ -26,15 +26,16 @@ public class SessionExamen {
     @Column(name = "heure_fin", nullable = false)
     private LocalTime heureFin;
 
-    @ManyToOne(fetch = FetchType.LAZY) // Can remain LAZY, as we're using JOIN FETCH in repository
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "examen_id")
     private Examen examen;
 
-    @ManyToOne(fetch = FetchType.LAZY) // Can remain LAZY, as we're using JOIN FETCH in repository
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "salle_id")
-    private Salles salle; // Changed from Salle to Salles
+    private Salles salle;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    // --- CRITICAL FIX: Ensure initialization and FetchType.LAZY (JOIN FETCH handles loading) ---
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}) // LAZY is fine with JOIN FETCH
     @JoinTable(
             name = "session_examen_superviseurs",
             joinColumns = @JoinColumn(name = "session_examen_id"),

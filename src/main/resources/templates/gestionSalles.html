@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -30,7 +29,7 @@
     <p class="text-center">Here you can add, edit, and delete exam rooms.</p>
 
     <div style="margin-bottom: 20px; text-align: right;">
-        <a th:href="@{/admin/salles/new}" class="btn btn-success">Add New Room</a>
+        <a th:href="@{/admin/gestionSalles/new}" class="btn btn-success">Add New Room</a>
     </div>
 
     <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
@@ -51,8 +50,8 @@
             <td th:text="${salle.nomSalle}">Room A101</td>
             <td th:text="${salle.capacite}">50</td>
             <td>
-                <a th:href="@{/admin/salles/edit/{id}(id=${salle.id})}" class="btn btn-secondary btn-sm">Edit</a>
-                <form th:action="@{/admin/salles/delete/{id}(id=${salle.id})}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this room?');">
+                <a th:href="@{/admin/gestionSalles/edit/{id}(id=${salle.id})}" class="btn btn-secondary btn-sm">Edit</a>
+                <form th:action="@{/admin/gestionSalles/delete/{id}(id=${salle.id})}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this room?');">
                     <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                 </form>
             </td>
@@ -69,5 +68,12 @@
 </div>
 
 <script th:src="@{/script.js}"></script>
+<style>
+    .btn-sm {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+        margin-right: 5px;
+    }
+</style>
 </body>
 </html>

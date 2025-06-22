@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,8 +21,7 @@
 
 <div class="container">
     <h1 class="text-center">Professor Dashboard</h1>
-    <p class="text-center">Welcome, <span sec:authentication="name">Professor</span>! Here are your teaching management options.</p>
-
+    <p class="text-center">Welcome, Professor! Here are your teaching management options.</p>
     <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-top: 30px;">
         <div class="card">
             <h3><a th:href="@{/professor/gestionNotes}">Manage Notes</a></h3>

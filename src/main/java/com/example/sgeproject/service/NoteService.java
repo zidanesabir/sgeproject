@@ -24,15 +24,21 @@ public class NoteService {
         this.examenService = examenService;
     }
 
-    // --- CRITICAL FIX: Use findAllWithDetails() ---
+    // --- CRITICAL FIX: Update to use findAllWithAllDetails() ---
     public List<Note> getAllNotes() {
-        return noteRepository.findAllWithDetails(); // Call the custom query
+        return noteRepository.findAllWithAllDetails(); // Use the new comprehensive query
     }
-    // ---------------------------------------------
+    // --------------------------------------------------------
 
     public Optional<Note> getNoteById(Long id) {
         return noteRepository.findById(id);
     }
+
+    // --- CRITICAL FIX: Update to use findByEtudiantWithExamAndModule() ---
+    public List<Note> getNotesByEtudiant(Etudiant etudiant) {
+        return noteRepository.findByEtudiantWithExamAndModule(etudiant); // Use the custom query
+    }
+    // --------------------------------------------------------------------
 
     @Transactional
     public Note saveNote(Note note) {
@@ -55,7 +61,10 @@ public class NoteService {
                 .orElseThrow(() -> new ResourceNotFoundException("Note not found with id: " + id));
 
         existingNote.setValeur(noteDetails.getValeur());
+        existingNote.setDateSaisie(noteDetails.getDateSaisie());
+        existingNote.setCommentaire(noteDetails.getCommentaire()); // Ensure these fields are handled if present
         existingNote.setDateModification(noteDetails.getDateModification());
+        existingNote.setEstValidee(noteDetails.isEstValidee());
 
         if (noteDetails.getEtudiant() != null && noteDetails.getEtudiant().getId() != null &&
                 (existingNote.getEtudiant() == null || !existingNote.getEtudiant().getId().equals(noteDetails.getEtudiant().getId()))) {
@@ -77,12 +86,5 @@ public class NoteService {
         Note note = noteRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Note not found with id: " + id));
         noteRepository.delete(note);
-    }
-
-    public List<Note> getNotesByEtudiant(Etudiant etudiant) {
-        // This method needs a specific query in NoteRepository, e.g.:
-        // `List<Note> findByEtudiant(Etudiant etudiant);`
-        // Make sure it uses a JOIN FETCH if Etudiant or Examen are needed for rendering.
-        return noteRepository.findByEtudiant(etudiant);
     }
 }

@@ -12,6 +12,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Controller
@@ -28,26 +30,40 @@ public class NoteController {
         this.examenService = examenService;
     }
 
-    @GetMapping // Handles GET /notes
+    // Displays all notes (if accessed directly, but usually handled by ProfesseurController)
+    @GetMapping
     public String listNotes(Model model) {
-        List<Note> notes = noteService.getAllNotes();
+        List<Note> notes = noteService.getAllNotes(); // Corrected method name (uses JOIN FETCH now)
         model.addAttribute("notes", notes);
-        return "gestionNotes"; // Renders src/main/resources/templates/gestionNotes.html
+        return "gestionNotes"; // Thymeleaf template name
     }
 
+    // --- CRITICAL FIX: Ensure 'note' object and dropdown lists are added for 'new' form ---
     @GetMapping("/new") // Handles GET /notes/new
     public String showCreateNoteForm(Model model) {
-        model.addAttribute("note", new Note());
+        model.addAttribute("note", new Note()); // <<< Add an empty Note object for form binding
+        // Pre-populate date fields if desired
+        // model.addAttribute("note", new Note(null, null, LocalDate.now(), null, null, false, null, null)); // Example for specific constructor
+
         List<Etudiant> etudiants = etudiantService.getAllEtudiants();
-        model.addAttribute("etudiants", etudiants);
+        model.addAttribute("etudiants", etudiants); // For Student dropdown
         List<Examen> examens = examenService.getAllExamens();
-        model.addAttribute("examens", examens);
-        return "createNoteForm"; // Create this Thymeleaf template
+        model.addAttribute("examens", examens);     // For Exam dropdown
+        return "createNoteForm"; // A new Thymeleaf template for creating notes
     }
+    // -------------------------------------------------------------------------------------
 
     @PostMapping("/save") // Handles POST /notes/save
     public String saveNote(@ModelAttribute Note note, RedirectAttributes redirectAttributes) {
         try {
+            // Set dateModification and estValidee defaults if not set by form
+            if (note.getDateSaisie() == null) {
+                note.setDateSaisie(LocalDate.now());
+            }
+            note.setDateModification(LocalDateTime.now());
+            // note.setEstValidee(false); // Only set if you want it always false initially
+
+            // Need to ensure Etudiant and Examen objects are fully loaded if only IDs are passed from form
             if (note.getEtudiant() != null && note.getEtudiant().getId() != null) {
                 Etudiant etudiant = etudiantService.getEtudiantById(note.getEtudiant().getId())
                         .orElseThrow(() -> new ResourceNotFoundException("Etudiant not found with id: " + note.getEtudiant().getId()));
@@ -60,28 +76,35 @@ public class NoteController {
             }
             noteService.saveNote(note);
             redirectAttributes.addFlashAttribute("successMessage", "Note saved successfully!");
-            return "redirect:/notes";
+            return "redirect:/professor/gestionNotes";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Error saving note: " + e.getMessage());
-            return "redirect:/notes/new";
+            e.printStackTrace(); // Keep for debugging
+            return "redirect:/professor/gestionNotes"; // Redirect back to list page on error
         }
     }
 
+    // --- CRITICAL FIX: Ensure 'note' object and dropdown lists are added for 'edit' form ---
     @GetMapping("/edit/{id}") // Handles GET /notes/edit/{id}
     public String showEditNoteForm(@PathVariable Long id, Model model) {
-        Note note = noteService.getNoteById(id)
+        Note note = noteService.getNoteById(id) // Corrected method name
                 .orElseThrow(() -> new ResourceNotFoundException("Note not found with id: " + id));
-        model.addAttribute("note", note);
+        model.addAttribute("note", note); // <<< Add the fetched Note object for form binding
+
         List<Etudiant> etudiants = etudiantService.getAllEtudiants();
-        model.addAttribute("etudiants", etudiants);
+        model.addAttribute("etudiants", etudiants); // For Student dropdown
         List<Examen> examens = examenService.getAllExamens();
-        model.addAttribute("examens", examens);
-        return "editNoteForm"; // Create this Thymeleaf template
+        model.addAttribute("examens", examens);     // For Exam dropdown
+        return "editNoteForm"; // A new Thymeleaf template for editing notes
     }
+    // -------------------------------------------------------------------------------------
 
     @PostMapping("/update/{id}") // Handles POST /notes/update/{id}
     public String updateNote(@PathVariable Long id, @ModelAttribute Note note, RedirectAttributes redirectAttributes) {
         try {
+            // Set modification date automatically
+            note.setDateModification(LocalDateTime.now());
+
             if (note.getEtudiant() != null && note.getEtudiant().getId() != null) {
                 Etudiant etudiant = etudiantService.getEtudiantById(note.getEtudiant().getId())
                         .orElseThrow(() -> new ResourceNotFoundException("Etudiant not found with id: " + note.getEtudiant().getId()));
@@ -94,13 +117,14 @@ public class NoteController {
             }
             noteService.updateNote(id, note);
             redirectAttributes.addFlashAttribute("successMessage", "Note updated successfully!");
-            return "redirect:/notes";
+            return "redirect:/professor/gestionNotes";
         } catch (ResourceNotFoundException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            return "redirect:/notes";
+            return "redirect:/professor/gestionNotes";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Error updating note: " + e.getMessage());
-            return "redirect:/notes/edit/" + id;
+            e.printStackTrace(); // Keep for debugging
+            return "redirect:/professor/gestionNotes/edit/" + id;
         }
     }
 
@@ -109,19 +133,22 @@ public class NoteController {
         try {
             noteService.deleteNote(id);
             redirectAttributes.addFlashAttribute("successMessage", "Note deleted successfully!");
+            return "redirect:/professor/gestionNotes";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Error deleting note: " + e.getMessage());
+            return "redirect:/professor/gestionNotes";
         }
-        return "redirect:/notes";
     }
 
-    @GetMapping("/etudiant/{etudiantId}") // Handles GET /notes/etudiant/{etudiantId}
+    // This method is used by 'relevésNotes.html' if it's retrieving notes for a specific student
+    // (This is likely in EtudiantController now, but if you keep a NoteController version, ensure it works)
+    @GetMapping("/etudiant/{etudiantId}")
     public String getNotesForEtudiant(@PathVariable Long etudiantId, Model model) {
         Etudiant etudiant = etudiantService.getEtudiantById(etudiantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Etudiant not found with id: " + etudiantId));
         List<Note> notes = noteService.getNotesByEtudiant(etudiant);
         model.addAttribute("notes", notes);
         model.addAttribute("etudiant", etudiant);
-        return "relevésNotes"; // Renders src/main/resources/templates/relevésNotes.html
+        return "relevésNotes";
     }
 }

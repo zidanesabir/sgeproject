@@ -12,6 +12,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jakarta.servlet.http.HttpSession;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -40,13 +42,17 @@ public class UtilisateurController {
             @RequestParam("email") String email,
             @RequestParam("password") String password,
             RedirectAttributes redirectAttributes,
-            Model model) {
+            Model model,
+            HttpSession session) {
 
         Optional<Personne> userOptional = personneService.authenticateUser(email, password);
 
         if (userOptional.isPresent()) {
             Personne user = userOptional.get();
             redirectAttributes.addFlashAttribute("successMessage", "Login successful! Welcome, " + user.getPrenom() + "!");
+
+            session.setAttribute("loggedInUserId", user.getId());
+            session.setAttribute("loggedInUserRole", user.getRole());
 
             if ("ADMIN".equals(user.getRole())) {
                 return "redirect:/admin/dashboard";
@@ -103,23 +109,21 @@ public class UtilisateurController {
         return "home";
     }
 
-    // --- Specific Dashboard Entry Points (Render the main dashboard templates) ---
     @GetMapping("/admin/dashboard")
     public String adminDashboardPage(Model model) {
-        return "dashboardAdmin"; // Renders dashboardAdmin.html
+        return "dashboardAdmin";
     }
 
     @GetMapping("/professor/dashboard")
     public String professorDashboardPage(Model model) {
-        return "dashboardProfessor"; // Renders dashboardProfessor.html
+        return "dashboardProfessor";
     }
 
     @GetMapping("/etudiant/dashboard")
     public String etudiantDashboardPage(Model model) {
-        return "dashboardEtudiant"; // Renders dashboardEtudiant.html
+        return "dashboardEtudiant";
     }
 
-    // --- ONLY User Management remains in UtilisateurController ---
     @GetMapping("/admin/gestionUtilisateurs")
     public String manageUsers(Model model) {
         List<Personne> users = personneService.getAllPersonnes();
@@ -175,18 +179,30 @@ public class UtilisateurController {
                              @Valid @ModelAttribute("userCreationRequest") UserCreationRequest request,
                              BindingResult result, RedirectAttributes redirectAttributes, Model model) {
         model.addAttribute("roles", Arrays.asList("ETUDIANT", "PROFESSOR", "ADMIN"));
+
+        // --- CRITICAL FIX: Remove the problematic 'else' block for password clearing ---
+        // This block was causing the "No message found under code ''" error.
+        // Validation for password fields will now only occur if the fields are non-empty.
         if (request.getPassword() != null && !request.getPassword().isEmpty()) {
-            if (result.hasErrors()) { return "editUserForm"; }
             if (!request.getPassword().equals(request.getConfirmPassword())) {
                 result.rejectValue("confirmPassword", "password.mismatch", "New passwords do not match.");
                 return "editUserForm";
             }
-        } else {
-            result.rejectValue("password", null, null);
-            result.rejectValue("confirmPassword", null, null);
+            // If passwords are provided and match, check their size/blankness
+            // This is implicitly done by @Valid on the DTO.
+            // No 'result.hasErrors()' check needed here if the specific rejectValue for mismatch is handled.
         }
+        // Removed: else {
+        // Removed:     result.rejectValue("password", null, null);
+        // Removed:     result.rejectValue("confirmPassword", null, null);
+        // Removed: }
+
+        // Check for *all* errors, including those on password fields if they were entered,
+        // or other fields.
         if (result.hasErrors()) { return "editUserForm"; }
+
         try {
+            request.setId(id);
             personneService.updateUser(id, request);
             redirectAttributes.addFlashAttribute("successMessage", "User updated successfully!");
             return "redirect:/admin/gestionUtilisateurs";
@@ -212,9 +228,9 @@ public class UtilisateurController {
         return "redirect:/admin/gestionUtilisateurs";
     }
 
-    @GetMapping("/logout") // Maps to URL /logout
-    public String logout(RedirectAttributes redirectAttributes) {
-        // In a non-secured app, you'd manually clear any session attributes here
+    @GetMapping("/logout")
+    public String logout(HttpSession session, RedirectAttributes redirectAttributes) {
+        session.invalidate();
         redirectAttributes.addFlashAttribute("infoMessage", "You have been logged out.");
         return "redirect:/login";
     }

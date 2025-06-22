@@ -2,7 +2,7 @@ package com.example.sgeproject.controller;
 
 import com.example.sgeproject.exception.ResourceNotFoundException;
 import com.example.sgeproject.model.Formation;
-import com.example.sgeproject.service.FormationService; // Assuming FormationService exists
+import com.example.sgeproject.service.FormationService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +11,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.List;
 
 @Controller
-@RequestMapping("/admin/gestionFormations") // Base mapping for admin formation operations
+@RequestMapping("/admin/gestionFormations") // This is the base path for FormationController
 public class FormationController {
 
     private final FormationService formationService;
@@ -27,13 +27,17 @@ public class FormationController {
         return "gestionFormations"; // Renders src/main/resources/templates/gestionFormations.html
     }
 
+    // --- CRITICAL FIX: Ensure this mapping exists and is correct ---
     @GetMapping("/new") // Handles GET /admin/gestionFormations/new
     public String showCreateFormationForm(Model model) {
         model.addAttribute("formation", new Formation());
-        return "createFormationForm"; // Create this Thymeleaf template
+        // You might add related data for dropdowns, e.g.,
+        // model.addAttribute("universities", universityService.getAllUniversities());
+        return "createFormationForm"; // Renders src/main/resources/templates/createFormationForm.html
     }
+    // ---------------------------------------------------------------
 
-    @PostMapping("/save") // Handles POST /admin/gestionFormations/save
+    @PostMapping("/save") // Handles POST /admin/gestionFormations/save (for new creation)
     public String saveFormation(@ModelAttribute Formation formation, RedirectAttributes redirectAttributes) {
         try {
             formationService.saveFormation(formation);
@@ -41,7 +45,7 @@ public class FormationController {
             return "redirect:/admin/gestionFormations";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Error adding formation: " + e.getMessage());
-            return "redirect:/admin/gestionFormations/new";
+            return "redirect:/admin/gestionFormations/new"; // Redirects back to the form on error
         }
     }
 
@@ -73,9 +77,10 @@ public class FormationController {
         try {
             formationService.deleteFormation(id);
             redirectAttributes.addFlashAttribute("successMessage", "Formation deleted successfully!");
+            return "redirect:/admin/gestionFormations";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Error deleting formation: " + e.getMessage());
+            return "redirect:/admin/gestionFormations";
         }
-        return "redirect:/admin/gestionFormations";
     }
 }

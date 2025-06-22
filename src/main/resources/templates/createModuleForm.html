@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGE Project - Create Module</title>
+    <link rel="stylesheet" th:href="@{/main.css}">
+</head>
+<body>
+<div class="header">
+    <div class="logo">SGE Project</div>
+    <nav>
+        <ul class="nav-links">
+            <li><a th:href="@{/home}">Home</a></li>
+            <li><a th:href="@{/admin/dashboard}">Dashboard</a></li>
+            <li><a th:href="@{/admin/gestionUtilisateurs}">Users</a></li>
+            <li><a th:href="@{/admin/gestionFormations}">Formations</a></li>
+            <li><a th:href="@{/admin/gestionModules}">Modules</a></li>
+            <li><a th:href="@{/admin/gestionSalles}">Rooms</a></li>
+            <li><a th:href="@{/admin/gestionExamens}">Exams</a></li>
+            <li><a th:href="@{/admin/statistiques}">Stats</a></li>
+            <li><a th:href="@{/logout}">Logout</a></li>
+        </ul>
+    </nav>
+</div>
+
+<div class="container" style="max-width: 600px; margin-top: 30px;">
+    <h2 class="text-center">Create New Module</h2>
+
+    <div th:if="${errorMessage}" class="alert alert-danger text-center" th:text="${errorMessage}"></div>
+    <div th:if="${successMessage}" class="alert alert-success text-center" th:text="${successMessage}"></div>
+
+    <form th:action="@{/admin/gestionModules/save}" th:object="${module}" method="post">
+        <div class="form-group">
+            <label for="nomModule">Module Name:</label>
+            <input type="text" id="nomModule" th:field="*{nomModule}" class="form-control" required autofocus>
+            <p th:if="${#fields.hasErrors('nomModule')}" th:errors="*{nomModule}" class="text-danger"></p>
+        </div>
+        <div class="form-group">
+            <label for="description">Description:</label>
+            <textarea id="description" th:field="*{description}" class="form-control"></textarea>
+            <p th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="text-danger"></p>
+        </div>
+        <div class="form-group">
+            <label for="coefficient">Coefficient:</label>
+            <input type="number" id="coefficient" th:field="*{coefficient}" class="form-control" required>
+            <p th:if="${#fields.hasErrors('coefficient')}" th:errors="*{coefficient}" class="text-danger"></p>
+        </div>
+        <div class="form-group">
+            <label for="formation">Formation:</label>
+            <select id="formation" th:field="*{formation.id}" class="form-control" required>
+                <option value="">-- Select Formation --</option>
+                <option th:each="formation : ${formations}" th:value="${formation.id}" th:text="${formation.nomFormation}"></option>
+            </select>
+            <p th:if="${#fields.hasErrors('formation.id')}" th:errors="*{formation.id}" class="text-danger"></p>
+        </div>
+        <div class="form-group">
+            <label for="professeur">Professor:</label>
+            <select id="professeur" th:field="*{professeur.id}" class="form-control" required>
+                <option value="">-- Select Professor --</option>
+                <option th:each="prof : ${professeurs}" th:value="${prof.id}" th:text="${prof.prenom + ' ' + prof.nom}"></option>
+            </select>
+            <p th:if="${#fields.hasErrors('professeur.id')}" th:errors="*{professeur.id}" class="text-danger"></p>
+        </div>
+        <div class="form-group text-center">
+            <button type="submit" class="btn btn-primary">Save Module</button>
+            <a th:href="@{/admin/gestionModules}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<div class="footer">
+    <p>&copy; 2023 SGE Project. All rights reserved.</p>
+</div>
+
+<script th:src="@{/script.js}"></script>
+</body>
+</html>

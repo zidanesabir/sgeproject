@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGE Project - Edit Note</title>
+    <link rel="stylesheet" th:href="@{/main.css}">
+</head>
+<body>
+<div class="header">
+    <div class="logo">SGE Project</div>
+    <nav>
+        <ul class="nav-links">
+            <li><a th:href="@{/home}">Home</a></li>
+            <li><a th:href="@{/professor/gestionNotes}">Manage Notes</a></li>
+            <li><a th:href="@{/professor/planningExamens}">Exam Planning</a></li>
+            <li><a th:href="@{/logout}">Logout</a></li>
+        </ul>
+    </nav>
+</div>
+
+<div class="container" style="max-width: 600px; margin-top: 30px;">
+    <h2 class="text-center">Edit Note</h2>
+
+    <div th:if="${errorMessage}" class="alert alert-danger text-center" th:text="${errorMessage}"></div>
+    <div th:if="${successMessage}" class="alert alert-success text-center" th:text="${successMessage}"></div>
+
+    <form th:action="@{/notes/update/{id}(id=*{id})}" th:object="${note}" method="post">
+        <input type="hidden" th:field="*{id}" />
+
+        <div class="form-group">
+            <label for="etudiantId">Student:</label>
+            <select id="etudiantId" th:field="*{etudiant.id}" class="form-control" required>
+                <option value="">-- Select Student --</option>
+                <option th:each="student : ${etudiants}" th:value="${student.id}" th:text="${student.prenom + ' ' + student.nom}"
+                        th:selected="${note.etudiant != null and student.id == note.etudiant.id}"></option>
+            </select>
+            <p th:if="${#fields.hasErrors('etudiant.id')}" th:errors="*{etudiant.id}" class="text-danger"></p>
+        </div>
+        <div class="form-group">
+            <label for="examenId">Exam:</label>
+            <select id="examenId" th:field="*{examen.id}" class="form-control" required>
+                <option value="">-- Select Exam --</option>
+                <option th:each="exam : ${examens}" th:value="${exam.id}" th:text="${exam.module?.nomModule + ' (' + exam.typeExamen + ' - ' + #temporals.format(exam.dateExamen, 'yyyy-MM-dd') + ')'}"
+                        th:selected="${note.examen != null and exam.id == note.examen.id}"></option>
+            </select>
+            <p th:if="${#fields.hasErrors('examen.id')}" th:errors="*{examen.id}" class="text-danger"></p>
+        </div>
+        <div class="form-group">
+            <label for="valeur">Note Value:</label>
+            <input type="number" step="0.01" min="0" max="20" id="valeur" th:field="*{valeur}" class="form-control" required>
+            <p th:if="${#fields.hasErrors('valeur')}" th:errors="*{valeur}" class="text-danger"></p>
+        </div>
+        <div class="form-group">
+            <label for="dateSaisie">Date Saisie:</label>
+            <input type="date" id="dateSaisie" th:field="*{dateSaisie}" class="form-control" required>
+            <p th:if="${#fields.hasErrors('dateSaisie')}" th:errors="*{dateSaisie}" class="text-danger"></p>
+        </div>
+        <div class="form-group">
+            <label for="commentaire">Comment:</label>
+            <textarea id="commentaire" th:field="*{commentaire}" class="form-control"></textarea>
+        </div>
+        <div class="form-group form-check">
+            <input type="checkbox" id="estValidee" th:field="*{estValidee}" class="form-check-input">
+            <label class="form-check-label" for="estValidee">Validated</label>
+        </div>
+        <div class="form-group">
+            <label for="dateModification">Date Modification:</label>
+            <input type="datetime-local" id="dateModification" th:field="*{dateModification}" class="form-control">
+        </div>
+
+        <div class="form-group text-center">
+            <button type="submit" class="btn btn-primary">Update Note</button>
+            <a th:href="@{/professor/gestionNotes}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<div class="footer">
+    <p>&copy; 2023 SGE Project. All rights reserved.</p>
+</div>
+
+<script th:src="@{/script.js}"></script>
+</body>
+</html>

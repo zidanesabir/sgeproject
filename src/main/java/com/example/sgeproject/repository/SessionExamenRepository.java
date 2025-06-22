@@ -10,15 +10,18 @@ import java.util.Optional;
 
 @Repository
 public interface SessionExamenRepository extends JpaRepository<SessionExamen, Long> {
-    // --- CRITICAL FIX: Aggressive JOIN FETCH to load all needed nested associations ---
+
+    // --- CRITICAL FIX: Add JOIN FETCH for superviseurs ---
     @Query("SELECT se FROM SessionExamen se " +
-            "JOIN FETCH se.examen e " +          // Fetch the examen
-            "JOIN FETCH e.module m " +           // Fetch the module of the examen
-            "JOIN FETCH m.formation " +          // Fetch the formation of the module
-            "JOIN FETCH m.professeur " +         // Fetch the professeur of the module
-            "JOIN FETCH se.salle")               // Fetch the salle of the session
-    List<SessionExamen> findAllWithAllDetailsForDisplay(); // New method name to reflect its comprehensiveness
+            "JOIN FETCH se.examen e " +
+            "JOIN FETCH e.module m " +
+            "JOIN FETCH m.formation " +
+            "JOIN FETCH m.professeur " +
+            "JOIN FETCH se.salle " +
+            "LEFT JOIN FETCH se.superviseurs s") // Use LEFT JOIN FETCH for ManyToMany collections
+    // in case a session has no supervisors, it won't filter out the session.
+    List<SessionExamen> findAllWithAllDetailsForDisplay();
     // ----------------------------------------------------------------------------------
 
-    Optional<SessionExamen> findById(Long id); // Keep the basic findById
+    Optional<SessionExamen> findById(Long id);
 }

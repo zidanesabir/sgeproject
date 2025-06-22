@@ -29,11 +29,14 @@ public class ReclamationService {
         this.noteRepository = noteRepository;
     }
 
-    public List<Reclamation> getAllReclamations() { // Corrected: Renamed from findAllReclamations
-        return reclamationRepository.findAll();
+    // --- CRITICAL FIX: Use the new findAllWithDetails() query ---
+    public List<Reclamation> getAllReclamations() {
+        return reclamationRepository.findAllWithDetails(); // Use the custom query
     }
+    // -----------------------------------------------------------
 
-    public Optional<Reclamation> getReclamationById(Long id) { // Corrected: Renamed from findReclamationById
+    public Optional<Reclamation> getReclamationById(Long id) {
+        // You might need a specific findByIdWithDetails if you access nested lazy fields from here.
         return reclamationRepository.findById(id);
     }
 
@@ -49,10 +52,8 @@ public class ReclamationService {
                     .orElseThrow(() -> new ResourceNotFoundException("Note not found with id: " + reclamation.getNote().getId()));
             reclamation.setNote(note);
         }
-
         reclamation.setStatut("Pending");
         reclamation.setDateReclamation(LocalDate.now());
-
         return reclamationRepository.save(reclamation);
     }
 
@@ -76,7 +77,6 @@ public class ReclamationService {
                     .orElseThrow(() -> new ResourceNotFoundException("Note not found with id: " + reclamationDetails.getNote().getId()));
             existingReclamation.setNote(note);
         }
-
         return reclamationRepository.save(existingReclamation);
     }
 

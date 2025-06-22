@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SGE Project - Exam Planning</title>
+    <title>SGE Project - Exam Schedule</title>
     <link rel="stylesheet" th:href="@{/main.css}">
 </head>
 <body>
@@ -13,56 +12,49 @@
     <nav>
         <ul class="nav-links">
             <li><a th:href="@{/home}">Home</a></li>
-            <li sec:authorize="hasAuthority('PROFESSOR')"><a th:href="@{/professor/gestionNotes}">Manage Notes</a></li>
-            <li sec:authorize="hasAuthority('PROFESSOR')"><a th:href="@{/professor/planningExamens}">Exam Planning</a></li>
-            <li sec:authorize="hasAuthority('ADMIN')"><a th:href="@{/admin/gestionExamens}">Manage Exams</a></li>
+            <li><a th:href="@{/etudiant/relevesNotes}">My Grades</a></li>
+            <li><a th:href="@{/etudiant/reclamations}">Reclamations</a></li>
+            <li><a th:href="@{/etudiant/planningExamens}">Exam Schedule</a></li>
             <li><a th:href="@{/logout}">Logout</a></li>
         </ul>
     </nav>
 </div>
 
 <div class="container">
-    <h1 class="text-center">Exam Planning</h1>
-    <p class="text-center" sec:authorize="hasAuthority('PROFESSOR')">View your assigned exam sessions.</p>
-    <p class="text-center" sec:authorize="hasAuthority('ADMIN')">Overview and manage all scheduled exam sessions.</p>
+    <h1 class="text-center">Exam Schedule</h1>
+    <p class="text-center">Here you can view your upcoming exam schedule.</p>
 
-    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
-    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+    <div th:if="${etudiant}" class="text-center">
+        <h3>Schedule for <span th:text="${etudiant.prenom} + ' ' + ${etudiant.nom}">Student Name</span></h3>
+    </div>
 
     <table class="table">
         <thead>
         <tr>
-            <th>Exam Title</th>
-            <th>Module</th>
+            <th>ID</th>
+            <th>Exam (Module)</th>
+            <th>Room</th>
             <th>Date</th>
             <th>Start Time</th>
             <th>End Time</th>
-            <th>Room</th>
-            <th>Supervisor(s)</th>
-            <th sec:authorize="hasAuthority('ADMIN')">Actions</th>
+            <th>Supervisors</th>
         </tr>
         </thead>
         <tbody>
-        <tr th:each="session : ${examSessions}">
-            <td th:text="${session.examen?.module?.nomModule} + ' ' + ${session.examen?.typeExamen}">Data Structures Final</td>
-            <td th:text="${session.examen?.module?.nomModule}">Data Structures</td>
-            <td th:text="${#temporals.format(session.heureDebut, 'yyyy-MM-dd')}">2024-01-20</td>
-            <td th:text="${#temporals.format(session.heureDebut, 'HH:mm')}">09:00</td>
-            <td th:text="${#temporals.format(session.heureFin, 'HH:mm')}">11:00</td>
-            <td th:text="${session.salle?.nomSalle}">Room B203</td>
+        <tr th:each="examSession : ${examSessions}">
+            <td th:text="${examSession.id}">1</td>
+            <td th:text="${examSession.examen?.module?.nomModule} + ' (' + ${examSession.examen?.typeExamen} + ')'">Algorithms (Final)</td>
+            <td th:text="${examSession.salle?.nomSalle}">Amphi A</td>
+            <td th:text="${#temporals.format(examSession.examen?.dateExamen, 'yyyy-MM-dd')}">2025-07-15</td>
+            <td th:text="${#temporals.format(examSession.heureDebut, 'HH:mm')}">09:00</td>
+            <td th:text="${#temporals.format(examSession.heureFin, 'HH:mm')}">11:00</td>
             <td>
-                <span th:each="prof : ${session.superviseurs}" th:text="${prof.nom} + ' ' + ${prof.prenom} + ' '"></span>
-                <span th:if="${session.superviseurs.isEmpty()}">N/A</span>
-            </td>
-            <td sec:authorize="hasAuthority('ADMIN')">
-                <a th:href="@{/admin/sessions/edit/{id}(id=${session.id})}" class="btn btn-secondary btn-sm">Edit</a>
-                <form th:action="@{/admin/sessions/delete/{id}(id=${session.id})}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this session?');">
-                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                </form>
+                <span th:each="prof : ${examSession.superviseurs}" th:text="${prof.prenom + ' ' + prof.nom + ' '}">Prof. Martin</span>
+                <span th:if="${#lists.isEmpty(examSession.superviseurs)}">N/A</span>
             </td>
         </tr>
-        <tr th:if="${examSessions.isEmpty()}">
-            <td th:colspan="${#authorization.expression('hasAuthority(\'ADMIN\')') ? 8 : 7}" class="text-center">No exam sessions scheduled.</td>
+        <tr th:if="${#lists.isEmpty(examSessions)}">
+            <td colspan="7" class="text-center">No exam sessions found for this student.</td>
         </tr>
         </tbody>
     </table>
@@ -73,5 +65,12 @@
 </div>
 
 <script th:src="@{/script.js}"></script>
+<style>
+    .btn-sm {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+        margin-right: 5px;
+    }
+</style>
 </body>
 </html>
