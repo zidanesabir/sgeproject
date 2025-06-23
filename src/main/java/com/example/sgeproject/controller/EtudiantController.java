@@ -37,6 +37,7 @@ import java.util.stream.Collectors;
  * Contrôleur gérant les requêtes liées aux étudiants dans l'application SGE.
  * Ce contrôleur gère l'affichage des relevés de notes, des réclamations et du planning des examens.
  */
+// Contrôleur pour la gestion des étudiants
 @Controller
 @RequestMapping("/etudiant")
 public class EtudiantController {
