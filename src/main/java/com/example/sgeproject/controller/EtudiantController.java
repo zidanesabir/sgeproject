@@ -77,7 +77,9 @@ public class EtudiantController {
      */
     @GetMapping("/relevesNotes")
     public String showRelevesNotes(Model model, HttpSession session) {
-        Long loggedInEtudiantId = (Long) session.getAttribute("loggedInUserId"); // Get ID from session
+        // Récupération de l'ID de l'étudiant depuis la session
+        // La clé "loggedInUserId" est définie lors de la connexion
+        Long loggedInEtudiantId = (Long) session.getAttribute("loggedInUserId");
 
         // --- CRITICAL FIX: If no user ID in session, redirect to login ---
         if (loggedInEtudiantId == null) {
@@ -85,8 +87,10 @@ public class EtudiantController {
         }
         // -----------------------------------------------------------------
 
+        // Récupération des informations de l'étudiant depuis la base de données
+        // Lance une exception si l'étudiant n'est pas trouvé
         Etudiant etudiant = etudiantService.getEtudiantById(loggedInEtudiantId)
-                .orElseThrow(() -> new ResourceNotFoundException("Logged-in Etudiant not found with ID: " + loggedInEtudiantId));
+                .orElseThrow(() -> new ResourceNotFoundException("Aucun étudiant trouvé avec l'ID : " + loggedInEtudiantId));
 
         List<Note> notes = noteService.getNotesByEtudiant(etudiant);
         model.addAttribute("notes", notes);
