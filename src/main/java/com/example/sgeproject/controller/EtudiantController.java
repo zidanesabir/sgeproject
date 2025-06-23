@@ -43,12 +43,23 @@ import java.util.stream.Collectors;
 public class EtudiantController {
 
     // Services injectés pour la gestion des données
-    private final EtudiantService etudiantService;          // Gestion des étudiants
-    private final NoteService noteService;                  // Gestion des notes
-    private final ReclamationService reclamationService;    // Gestion des réclamations
-    private final SessionExamenService sessionExamenService; // Gestion des sessions d'examen
+    // Service pour la gestion des étudiants
+    private final EtudiantService etudiantService;          // Service pour la gestion des étudiants
+    // Service pour la gestion des notes
+    private final NoteService noteService;                  // Service pour la gestion des notes
+    // Service pour la gestion des réclamations
+    private final ReclamationService reclamationService;    // Service pour la gestion des réclamations
+    // Service pour la gestion des sessions d'examen
+    private final SessionExamenService sessionExamenService; // Service pour la gestion des sessions d'examen
 
     // Constructeur avec injection des dépendances
+    /**
+     * Constructeur pour l'initialisation des services nécessaires au contrôleur.
+     * @param etudiantService Service pour la gestion des étudiants
+     * @param noteService Service pour la gestion des notes
+     * @param reclamationService Service pour la gestion des réclamations
+     * @param sessionExamenService Service pour la gestion des sessions d'examen
+     */
     public EtudiantController(EtudiantService etudiantService, NoteService noteService,
                             ReclamationService reclamationService, SessionExamenService sessionExamenService) {
         this.etudiantService = etudiantService;
