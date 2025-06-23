@@ -92,14 +92,21 @@ public class EtudiantController {
         Etudiant etudiant = etudiantService.getEtudiantById(loggedInEtudiantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Aucun étudiant trouvé avec l'ID : " + loggedInEtudiantId));
 
+        // Récupération de toutes les notes de l'étudiant
         List<Note> notes = noteService.getNotesByEtudiant(etudiant);
+        
+        // Ajout des données au modèle pour l'affichage dans la vue
         model.addAttribute("notes", notes);
         model.addAttribute("etudiant", etudiant);
 
+        // Calcul de la moyenne générale des notes
+        // Utilisation de l'API Stream pour le calcul
         double overallAverage = notes.stream()
-                .mapToDouble(note -> note.getValeur().doubleValue())
-                .average()
-                .orElse(0.0);
+                .mapToDouble(note -> note.getValeur().doubleValue()) // Conversion des notes en double
+                .average()                                           // Calcul de la moyenne
+                .orElse(0.0);                                        // Valeur par défaut si pas de notes
+                
+        // Ajout de la moyenne au modèle
         model.addAttribute("overallAverage", overallAverage);
 
         return "relevésNotes";
