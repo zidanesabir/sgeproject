@@ -69,6 +69,12 @@ public class EtudiantController {
     }
 
     // Affiche le relevé de notes de l'étudiant
+    /**
+     * Affiche le relevé de notes de l'étudiant connecté.
+     * @param model Le modèle pour transmettre les données à la vue
+     * @param session La session HTTP pour récupérer l'utilisateur connecté
+     * @return Le nom de la vue à afficher
+     */
     @GetMapping("/relevesNotes")
     public String showRelevesNotes(Model model, HttpSession session) {
         Long loggedInEtudiantId = (Long) session.getAttribute("loggedInUserId"); // Get ID from session
@@ -96,6 +102,12 @@ public class EtudiantController {
     }
 
     // Affiche les réclamations de l'étudiant
+    /**
+     * Affiche les réclamations de l'étudiant connecté.
+     * @param model Le modèle pour transmettre les données à la vue
+     * @param session La session HTTP pour récupérer l'utilisateur connecté
+     * @return Le nom de la vue à afficher
+     */
     @GetMapping("/reclamations")
     public String showStudentReclamations(Model model, HttpSession session) {
         Long loggedInEtudiantId = (Long) session.getAttribute("loggedInUserId");
@@ -118,6 +130,12 @@ public class EtudiantController {
     }
 
     // Affiche le planning des examens de l'étudiant
+    /**
+     * Affiche le planning des examens de l'étudiant connecté.
+     * @param model Le modèle pour transmettre les données à la vue
+     * @param session La session HTTP pour récupérer l'utilisateur connecté
+     * @return Le nom de la vue à afficher
+     */
     @GetMapping("/planningExamens")
     public String showStudentExamPlanning(Model model, HttpSession session) {
         Long loggedInEtudiantId = (Long) session.getAttribute("loggedInUserId");
